@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'whatsapp_stickers.pb.dart';
@@ -29,7 +33,9 @@ class WhatsappStickers {
       this._licenseAgreementWebsite);
 
   void addSticker(List contentsOfFile, {List emojis}) {
-    contentsOfFile.forEach((sticker) {
+    contentsOfFile.forEach((sticker) async {
+      // var response = await networkImageToByte(_trayImageFileName);
+      // print(base64Encode(response));
       _stickers[sticker] = ['emojis'];
     }); 
   }
@@ -50,7 +56,13 @@ class WhatsappStickers {
     try {
       await _channel.invokeMethod(
           "sendToWhatsApp", message.writeToBuffer());
+      
+      print('acho que foiiiii, tataratammmmm');
     } on PlatformException catch (e) {
+      print('aaqqq');
+      print(e.code);
+      print(e.details);
+      print('fim');
       switch (e.code) {
         case "FILE_NOT_FOUND":
           throw WhatsappStickersFileNotFoundException(e.message);
@@ -74,5 +86,14 @@ class WhatsappStickers {
           throw WhatsappStickersException(e.message);
       }
     }
+  }
+
+
+  Future<Uint8List> networkImageToByte(String imageUrl) async {
+    HttpClient httpClient = HttpClient();
+    var request = await httpClient.getUrl(Uri.parse(imageUrl));
+    var response = await request.close();
+    Uint8List bytes = await consolidateHttpClientResponseBytes(response);
+    return bytes;
   }
 }

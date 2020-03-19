@@ -31,24 +31,24 @@ class StickerPack {
     let identifier: String
     let name: String
     let publisher: String
-    let trayImage: ImageData
+    let trayImage: String
     let publisherWebsite: String?
     let privacyPolicyWebsite: String?
     let licenseAgreementWebsite: String?
 
     var stickers: [Sticker]
 
-    var bytesSize: Int64 {
-        var totalBytes: Int64 = Int64(name.utf8.count + publisher.utf8.count + trayImage.data.count)
-        for sticker in stickers {
-            totalBytes += sticker.bytesSize
-        }
-        return totalBytes
-    }
+    // var bytesSize: Int64 {
+    //     var totalBytes: Int64 = Int64(name.utf8.count + publisher.utf8.count + trayImage.count)
+    //     for sticker in stickers {
+    //         totalBytes += sticker.bytesSize
+    //     }
+    //     return totalBytes
+    // }
 
-    var formattedSize: String {
-        return ByteCountFormatter.string(fromByteCount: bytesSize, countStyle: .file)
-    }
+    // var formattedSize: String {
+    //     return ByteCountFormatter.string(fromByteCount: bytesSize, countStyle: .file)
+    // }
 
     /**
      *  Initializes a sticker pack with a name, publisher and tray image name.
@@ -81,8 +81,8 @@ class StickerPack {
         self.name = name
         self.publisher = publisher
 
-        let trayCompliantImageData: ImageData = try ImageData.imageDataIfCompliant(contentsOfFile: trayImageFileName, isTray: true)
-        self.trayImage = trayCompliantImageData
+        // let trayCompliantImageData: ImageData = try ImageData.imageDataIfCompliant(contentsOfFile: trayImageFileName, isTray: true)
+        self.trayImage = trayImageFileName
 
         stickers = []
 
@@ -109,7 +109,7 @@ class StickerPack {
      - .incorrectImageSize if the tray image is not within the allowed size
      - .animatedImagesNotSupported if the tray image is animated
      */
-    init(identifier: String, name: String, publisher: String, trayImagePNGData: Data, publisherWebsite: String?, privacyPolicyWebsite: String?, licenseAgreementWebsite: String?) throws {
+    init(identifier: String, name: String, publisher: String, trayImagePNGData: String, publisherWebsite: String?, privacyPolicyWebsite: String?, licenseAgreementWebsite: String?) throws {
         guard !name.isEmpty && !publisher.isEmpty && !identifier.isEmpty else {
             throw StickerPackError.emptyString
         }
@@ -122,8 +122,8 @@ class StickerPack {
         self.name = name
         self.publisher = publisher
 
-        let trayCompliantImageData: ImageData = try ImageData.imageDataIfCompliant(rawData: trayImagePNGData, extensionType: .png, isTray: true)
-        self.trayImage = trayCompliantImageData
+        // let trayCompliantImageData: ImageData = try ImageData.imageDataIfCompliant(rawData: trayImagePNGData, extensionType: .png, isTray: true)
+        self.trayImage = trayImagePNGData
 
         stickers = []
 
@@ -163,7 +163,7 @@ class StickerPack {
      - .stickersNumOutsideAllowableRange if current number of stickers is not withing limits
      - All exceptions from Sticker(imageData:type:emojis:)
      */
-    func addSticker(imageData: Data, type: ImageDataExtension, emojis: [String]?) throws {
+    func addSticker(imageData: String, type: ImageDataExtension, emojis: [String]?) throws {
         guard stickers.count <= Limits.MaxStickersPerPack else {
             throw StickerPackError.stickersNumOutsideAllowableRange
         }
@@ -186,18 +186,13 @@ class StickerPack {
             json["identifier"] = self.identifier
             json["name"] = self.name
             json["publisher"] = self.publisher
-            json["tray_image"] = self.trayImage.image!.pngData()?.base64EncodedString()
+            json["tray_image"] = self.trayImage
 
             var stickersArray: [[String: Any]] = []
             for sticker in self.stickers {
                 var stickerDict: [String: Any] = [:]
 
-                if let imageData = sticker.imageData.webpData {
-                    stickerDict["image_data"] = imageData.base64EncodedString()
-                } else {
-                    print("Skipping bad sticker data")
-                    continue
-                }
+                stickerDict["image_data"] = sticker.imageData
 
                 stickerDict["emojis"] = sticker.emojis
 

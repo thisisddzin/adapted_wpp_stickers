@@ -69,12 +69,12 @@ struct StickerEmojis {
  */
 class Sticker {
 
-    let imageData: ImageData
+    let imageData: String
     let emojis: [String]?
 
-    var bytesSize: Int64 {
-        return imageData.bytesSize
-    }
+    // var bytesSize: Int64 {
+    //     return imageData.bytesSize
+    // }
 
     /**
      *  Initializes a sticker with an image file and emojis.
@@ -91,7 +91,7 @@ class Sticker {
      - .tooManyEmojis if there are too many emojis assigned to the sticker
      */
     init(contentsOfFile filename: String, emojis: [String]?) throws {
-        self.imageData = try ImageData.imageDataIfCompliant(contentsOfFile: filename, isTray: false)
+        self.imageData = filename
         self.emojis = try StickerEmojis.canonicalizedEmojis(rawEmojis: emojis)
     }
 
@@ -108,14 +108,10 @@ class Sticker {
      - .animatedImagesNotSupported if the image is animated
      - .tooManyEmojis if there are too many emojis assigned to the sticker
      */
-    init(imageData: Data, type: ImageDataExtension, emojis: [String]?) throws {
-        self.imageData = try ImageData.imageDataIfCompliant(rawData:imageData, extensionType: type, isTray: false)
+    init(imageData: String, type: ImageDataExtension, emojis: [String]?) throws {
+        self.imageData = imageData
         self.emojis = try StickerEmojis.canonicalizedEmojis(rawEmojis: emojis)
     }
 
-    func copyToPasteboardAsImage() {
-        if let image = imageData.image {
-            Interoperability.copyImageToPasteboard(image: image)
-        }
-    }
+    
 }

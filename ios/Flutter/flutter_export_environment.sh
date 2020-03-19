@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/adenilson/development/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/adenilson/Documents/gocase/gofun/lib/src/external_libs_adapters/whatsapp_stickers_ios"
+export "FLUTTER_APPLICATION_PATH=/Users/adenilson/Documents/myprojects/adapted_wpp_stickers"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build/ios"
