@@ -30,17 +30,20 @@ public class SwiftWhatsappStickersPlugin: NSObject, FlutterPlugin {
         do {
             message = try WhatsappStickers_SendToWhatsAppPayload.init(serializedData: arguments!.data)
             
+            // result(FlutterError(code: "MY_SWIFT_DEBUG_IN_FLUTTER", message: "Debugging swift in flutter.", details: message!.trayImageFileName));
+            // return;
+            
             let stickerPack = try StickerPack(identifier: message!.identifier,
                                           name: message!.name,
                                           publisher: message!.publisher,
-                                          trayImageFileName: registrar!.lookupKey(forAsset: message!.trayImageFileName),
+                                          trayImageFileName: message!.trayImageFileName,
                                           publisherWebsite: message!.publisherWebsite,
                                           privacyPolicyWebsite: message!.privacyPolicyWebsite,
                                           licenseAgreementWebsite: message!.licenseAgreementWebsite)
             
             for sticker in message!.stickers {
                 do {
-                    try stickerPack.addSticker(contentsOfFile: registrar!.lookupKey(forAsset: sticker.key), emojis: sticker.value.all)
+                    try stickerPack.addSticker(contentsOfFile: sticker.key, emojis: sticker.value.all)
                 } catch StickerPackError.fileNotFound {
                     result(FlutterError(code: "FILE_NOT_FOUND", message: "\(sticker.key) not found.", details: nil));
                     return;
